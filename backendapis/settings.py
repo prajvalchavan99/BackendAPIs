@@ -81,10 +81,40 @@ WSGI_APPLICATION = 'backendapis.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'verceldb',
+        'USER': 'default',
+        'PASSWORD': 'DBcWmbEs9Ri0',
+        'HOST': 'ep-snowy-morning-95100156-pooler.us-east-1.postgres.vercel-storage.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'connect_timeout': 15,
+            'options': '-c statement_timeout=30000',
+        },
+    },
+    'prisma': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'verceldb',
+        'USER': 'default',
+        'PASSWORD': 'DBcWmbEs9Ri0',
+        'HOST': 'ep-snowy-morning-95100156-pooler.us-east-1.postgres.vercel-storage.com',
+        'PORT': '5432',
+        'OPTIONS': {
+            'connect_timeout': 15,
+            'options': '-c statement_timeout=30000',
+            'pgbouncer': True,
+        },
+    },
+    'non_pooling': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'verceldb',
+        'USER': 'default',
+        'PASSWORD': 'DBcWmbEs9Ri0',
+        'HOST': 'ep-snowy-morning-95100156.us-east-1.postgres.vercel-storage.com',
+        'PORT': '5432',
+    },
 }
+
 
 
 # Password validation
