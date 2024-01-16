@@ -90,6 +90,7 @@ DATABASES = {
         'OPTIONS': {
             'connect_timeout': 15,
             'options': '-c statement_timeout=30000',
+            'sslmode': 'require',
         },
     },
     'prisma': {
