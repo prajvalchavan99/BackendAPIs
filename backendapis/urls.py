@@ -34,10 +34,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/',include('authentification.urls')),
     path('tempfileupload/',include('tempupload.urls')),
-    path('daily-memes/',include('dailymemes.urls')),
-    path('task-that/',include('taskthat.urls')),
     path('swagger/',schema_view.with_ui('swagger',cache_timeout=0),name='schema-swagger-ui')
 ]
 

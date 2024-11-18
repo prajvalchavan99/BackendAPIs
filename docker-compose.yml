@@ -1,0 +1,46 @@
+version: '3.3'
+
+services:
+  django:
+    build:
+      context: .
+    container_name: backendapis
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
+  celery:
+    build:
+      context: .
+    container_name: celery_worker
+    command: celery -A backendapis worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
+  beat:
+    build:
+      context: .
+    container_name: celery_beat
+    command: celery -A backendapis beat --loglevel=info --pidfile=
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
