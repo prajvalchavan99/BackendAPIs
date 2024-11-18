@@ -29,13 +29,16 @@ schema_view = get_schema_view(
         description='API documentation for All APIs',
     ),
     public=True,
-    permission_classes=(permissions.IsAdminUser,)
+    permission_classes=(permissions.AllowAny,)
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('auth/',include('authentification.urls')),
     path('tempfileupload/',include('tempupload.urls')),
+    path('daily-memes/',include('dailymemes.urls')),
+    path('task-that/',include('taskthat.urls')),
     path('swagger/',schema_view.with_ui('swagger',cache_timeout=0),name='schema-swagger-ui')
 ]
 
-# urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
