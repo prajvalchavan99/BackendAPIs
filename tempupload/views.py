@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.shortcuts import get_object_or_404
 from .models import UploadedFile
 from .serializers import UploadedFileSerializer
@@ -57,27 +57,36 @@ class UploadedFileViewset(APIView):
             return Response({'message': 'File Uploaded Successfully!'}, status=status.HTTP_201_CREATED)
         else:
             return Response({'error': 'Invalid Request!'}, status=status.HTTP_400_BAD_REQUEST)
-
+        
     def get(self, request, *args, **kwargs):
         endpoint = self.kwargs['endpoint']
-        file_data = get_object_or_404(UploadedFile, endpoint=endpoint,expiration_time__gte=now() ,is_deleted=False)
+
+        # Retrieve file data with expiration and deletion checks
+        file_data = get_object_or_404(
+            UploadedFile,
+            endpoint=endpoint,
+            expiration_time__gte=now(),
+            is_deleted=False
+        )
+        serialized_data = UploadedFileSerializer(file_data).data
+        return Response(serialized_data, status=status.HTTP_200_OK)
+
+class DownloadUploadedFile(APIView):
+    def get(self, request, *args, **kwargs):
+        endpoint = self.kwargs['endpoint']
+        file_data = get_object_or_404(
+            UploadedFile,
+            endpoint=endpoint,
+            expiration_time__gte=now(),
+            is_deleted=False
+        )
 
         file_path = os.path.join(UPLOAD_DIR, file_data.file_name)
         if not os.path.exists(file_path):
-            return Response({'error': 'File not found!'}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({'error': 'File not found!'}, status=404)
 
-        # Include metadata (filename and validity) in the response
-        response_data = {
-            'filename': file_data.file_name,
-            'validity': file_data.validity
-        }
-        with open(file_path, 'rb') as file:
-            response = HttpResponse(file, content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename="{file_data.file_name}"'
+        # Serve the file with metadata in headers
+        response = FileResponse(open(file_path, 'rb'), content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{file_data.file_name}"'
 
-            # Add metadata to the response headers (if needed)
-            response['X-Filename'] = file_data.file_name
-            response['X-Validity'] = file_data.validity
-
-            # Return the file and metadata as JSON
-            return JsonResponse(response_data)
+        return response
