@@ -10,4 +10,4 @@ class UploadedFile(models.Model):
     endpoint = models.SlugField(null=True)
 
     def __str__(self):
-        return self.file.name
+        return self.file_name

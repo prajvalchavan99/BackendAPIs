@@ -12,7 +12,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'delete-expired-files': {
         'task': 'tempupload.tasks.delete_expired_files_task',
-        'schedule': crontab(minute=0, hour='*'),  # Every hour
+        'schedule': crontab(minute=0, hour=0),  # Every day
     },
 }
 

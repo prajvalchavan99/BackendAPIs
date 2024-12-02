@@ -15,15 +15,6 @@ UPLOAD_DIR = os.path.join(settings.MEDIA_ROOT, 'uploads')
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-def delete_expired_files():
-    current_time = timezone.now()
-    expired_files = UploadedFile.objects.filter(expiration_time__lte=current_time, is_deleted=False)
-    expired_files.update(is_deleted=True)
-    for file in expired_files:
-        file_path = os.path.join(UPLOAD_DIR, file.file_name)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
 class UploadedFileViewset(APIView):
 
     def post(self, request, *args, **kwargs):
@@ -36,7 +27,7 @@ class UploadedFileViewset(APIView):
             time_validity = request.POST.get('validity')
 
             if UploadedFile.objects.filter(endpoint=endpoint, is_deleted=False).exists():
-                return Response({'message': 'Endpoint already taken!'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'URL already taken!'}, status=status.HTTP_400_BAD_REQUEST)
 
             expiration_time = timezone.now() + timezone.timedelta(minutes=int(time_validity))
             file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
